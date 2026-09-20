@@ -5,9 +5,9 @@ import { ConfigurationForm } from "@/components/configuration-form";
 export default async function EditConfigurationPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
+  const { id } = await params;
 
   const config = await prisma.importConfiguration.findUnique({
     where: { id },
@@ -17,8 +17,10 @@ export default async function EditConfigurationPage({
   if (!config) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">Edit: {config.name}</h1>
+    <div className="mx-auto max-w-4xl px-6 py-12">
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight">
+        Edit: {config.name}
+      </h1>
       <ConfigurationForm
         configId={config.id}
         initialData={{

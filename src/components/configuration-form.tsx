@@ -24,15 +24,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
 import { DATA_TYPES, VALIDATION_TYPES } from "@/lib/constants";
 
 const fieldMappingSchema = z.object({
@@ -63,6 +54,9 @@ const emptyMapping = {
   isRequired: false,
   validationType: "NONE" as const,
 };
+
+const fieldClass =
+  "border-0 bg-[#FAFAF8] rounded-xl focus-visible:ring-2 focus-visible:ring-[#2F5D4E] focus-visible:ring-offset-0";
 
 export function ConfigurationForm({
   initialData,
@@ -95,147 +89,182 @@ export function ConfigurationForm({
     setSubmitting(true);
     setServerError(null);
 
-    const url = configId
-      ? `/api/configurations/${configId}`
-      : "/api/configurations";
-    const method = configId ? "PUT" : "POST";
+    try {
+      const url = configId
+        ? `/api/configurations/${configId}`
+        : "/api/configurations";
+      const method = configId ? "PUT" : "POST";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    setSubmitting(false);
+      if (!res.ok) {
+        let errorMessage = "Gagal menyimpan konfigurasi";
+        try {
+          const data = await res.json();
+          errorMessage = data.message || errorMessage;
+        } catch {
+          // Ignore JSON parse error if response is not JSON
+        }
+        setServerError(errorMessage);
+        setSubmitting(false);
+        return;
+      }
 
-    if (!res.ok) {
-      const data = await res.json();
-      setServerError(data.message || "Gagal menyimpan konfigurasi");
-      return;
+      router.push("/admin/configurations");
+      router.refresh();
+    } catch (err) {
+      setServerError("Terjadi kesalahan jaringan atau server.");
+      setSubmitting(false);
     }
-
-    router.push("/admin/configurations");
-    router.refresh();
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informasi Konfigurasi</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Configuration Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Employee Import" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Import data employee dari excel"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="targetData"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Target Data</FormLabel>
-                  <FormControl>
-                    <Input placeholder="employee" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                  <FormLabel>Status Active</FormLabel>
-                  <FormControl>
-                    <Switch
-                      checked={field.value === "ACTIVE"}
-                      onCheckedChange={(checked) =>
-                        field.onChange(checked ? "ACTIVE" : "INACTIVE")
-                      }
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
+        {/* Informasi Konfigurasi */}
+        <div className="space-y-5 rounded-2xl bg-white p-8 shadow-sm">
+          <h2 className="text-lg font-semibold">Informasi konfigurasi</h2>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Field Mapping</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Excel Column</TableHead>
-                  <TableHead>Target Field</TableHead>
-                  <TableHead>Data Type</TableHead>
-                  <TableHead>Required</TableHead>
-                  <TableHead>Validation</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm text-[#6B6863]">
+                  Configuration Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Employee Import"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs text-[#A23B2E]" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm text-[#6B6863]">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Import data employee dari excel"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs text-[#A23B2E]" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="targetData"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm text-[#6B6863]">
+                  Target Data
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="employee"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs text-[#A23B2E]" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between rounded-xl bg-[#FAFAF8] p-4">
+                <FormLabel className="text-sm">Status Active</FormLabel>
+                <FormControl>
+                  <Switch
+                    checked={field.value === "ACTIVE"}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked ? "ACTIVE" : "INACTIVE")
+                    }
+                    className="data-[state=checked]:bg-[#2F5D4E]"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Field Mapping */}
+        <div className="space-y-5 rounded-2xl bg-white p-8 shadow-sm">
+          <h2 className="text-lg font-semibold">Field mapping</h2>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead>
+                <tr className="text-xs text-[#6B6863]">
+                  <th className="px-3 py-2 font-medium">Excel Column</th>
+                  <th className="px-3 py-2 font-medium">Target Field</th>
+                  <th className="px-3 py-2 font-medium">Data Type</th>
+                  <th className="px-3 py-2 font-medium">Required</th>
+                  <th className="px-3 py-2 font-medium">Validation</th>
+                  <th className="px-3 py-2" />
+                </tr>
+              </thead>
+              <tbody>
                 {fields.map((mappingField, index) => (
-                  <TableRow key={mappingField.id}>
-                    <TableCell>
+                  <tr
+                    key={mappingField.id}
+                    className={index % 2 === 0 ? "bg-[#FAFAF8]" : "bg-white"}
+                  >
+                    <td className="rounded-l-lg px-3 py-2.5">
                       <FormField
                         control={form.control}
                         name={`fieldMappings.${index}.excelColumn`}
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input placeholder="First Name" {...field} />
+                              <Input
+                                placeholder="First Name"
+                                className={`${fieldClass} bg-white`}
+                                {...field}
+                              />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-xs text-[#A23B2E]" />
                           </FormItem>
                         )}
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <FormField
                         control={form.control}
                         name={`fieldMappings.${index}.targetField`}
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input placeholder="firstname" {...field} />
+                              <Input
+                                placeholder="firstname"
+                                className={`${fieldClass} bg-white`}
+                                {...field}
+                              />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-xs text-[#A23B2E]" />
                           </FormItem>
                         )}
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <FormField
                         control={form.control}
                         name={`fieldMappings.${index}.dataType`}
@@ -244,7 +273,7 @@ export function ConfigurationForm({
                             onValueChange={field.onChange}
                             value={field.value}
                           >
-                            <SelectTrigger className="w-[130px]">
+                            <SelectTrigger className="w-[130px] border-0 bg-white focus:ring-2 focus:ring-[#2F5D4E]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -257,8 +286,8 @@ export function ConfigurationForm({
                           </Select>
                         )}
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <FormField
                         control={form.control}
                         name={`fieldMappings.${index}.isRequired`}
@@ -266,11 +295,12 @@ export function ConfigurationForm({
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="data-[state=checked]:bg-[#2F5D4E]"
                           />
                         )}
                       />
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <FormField
                         control={form.control}
                         name={`fieldMappings.${index}.validationType`}
@@ -279,7 +309,7 @@ export function ConfigurationForm({
                             onValueChange={field.onChange}
                             value={field.value}
                           >
-                            <SelectTrigger className="w-[110px]">
+                            <SelectTrigger className="w-[110px] border-0 bg-white focus:ring-2 focus:ring-[#2F5D4E]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -292,37 +322,40 @@ export function ConfigurationForm({
                           </Select>
                         )}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <Button
+                    </td>
+                    <td className="rounded-r-lg px-3 py-2.5 text-right">
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="sm"
                         onClick={() => remove(index)}
                         disabled={fields.length === 1}
+                        className="text-xs font-medium text-[#A23B2E] hover:underline disabled:cursor-not-allowed disabled:text-[#C9C6BD] disabled:no-underline"
                       >
                         Hapus
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
+          </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4"
-              onClick={() => append(emptyMapping)}
-            >
-              + Tambah Mapping
-            </Button>
-          </CardContent>
-        </Card>
+          <Button
+            type="button"
+            onClick={() => append(emptyMapping)}
+            className="rounded-full bg-[#F1EFEA] text-[#181B1E] shadow-none hover:bg-[#E6E3DC]"
+          >
+            + Tambah Mapping
+          </Button>
+        </div>
 
-        {serverError && <p className="text-sm text-red-500">{serverError}</p>}
+        {serverError && <p className="text-sm text-[#A23B2E]">{serverError}</p>}
 
-        <Button type="submit" disabled={submitting}>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={submitting}
+          className="rounded-full bg-[#2F5D4E] text-white hover:bg-[#264B3F]"
+        >
           {submitting ? "Menyimpan..." : "Simpan Konfigurasi"}
         </Button>
       </form>
