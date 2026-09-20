@@ -74,25 +74,3 @@ User biasa bisa melakukan import data di `/import` dan melihat riwayatnya sendir
 4. Upload file → sistem menampilkan Preview (jumlah baris valid/invalid beserta alasan errornya).
 5. Klik "Process Import" untuk memasukkan baris yang valid ke database.
 6. Lihat hasil di halaman Import Result, dan cek rekapnya di `/import/history`.
-
-## Status Pengerjaan
-
-### Completed
-
-- Login & session management (JWT + httpOnly cookie), role-based access (Admin/User)
-- CRUD Import Configuration + Field Mapping (dinamis, reusable untuk jenis data apa pun)
-- Download Template Excel sesuai konfigurasi
-- Upload Excel, Preview, dan Validation (Required, Data Type, Unique, Email, Date)
-- Process Import dengan transaction, insert massal (`createMany`)
-- Import Result (ringkasan sukses/gagal + detail error per baris)
-- Import History (Admin melihat semua, User hanya melihat miliknya sendiri)
-- Audit trail pada Import Configuration (createdBy/At, updatedBy/At)
-- File validation: ukuran maksimal, ekstensi, struktur header
-
-### Not Completed
-
-- Fitur bonus lain belum dikerjakan: Background Processing, Progress Import, Multiple Excel Sheet, Column Transformation, Default Value, Lookup/Reference Data, Automated Test, Docker
-
-### Reason
-
-Waktu pengerjaan diprioritaskan untuk menyelesaikan seluruh requirement utama (alur Configuration → Upload → Preview → Validation → Import → Result) terlebih dahulu sesuai urutan prioritas di soal, sebelum masuk ke fitur bonus yang sifatnya optional.
